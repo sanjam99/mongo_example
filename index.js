@@ -1,26 +1,49 @@
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://sanjam99:sanket8788@cluster0.m6dkq1h.mongodb.net/?retryWrites=true&w=majority";
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+mongoose.connect('mongodb+srv://sanjam99:sanket8788@cluster0.m6dkq1h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
 });
 
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
+const internSchema = new mongoose.Schema({
+    end_year: String,
+    intensity: Number,
+    sector: String,
+    topic: String,
+    insight: String,
+    url: String,
+    region: String,
+    start_year: String,
+    impact: String,
+    added: String,
+    published: String,
+    country: String,
+    relevance: Number,
+    pestle: String,
+    source: String,
+    title: String,
+    likelihood: Number,
+    city: String
+} ,{collection: 'intern'});
+
+const Intern = mongoose.model('intern', internSchema);
+
+app.get('/data', async (req, res) => {
+    try {
+        const data = await Intern.find();
+        console.log('Data fetched from MongoDB:', data);
+        res.json(data);
+    } catch (err) {
+        console.error('Error fetching data:', err);
+        res.status(500).send(err);
+    }
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
